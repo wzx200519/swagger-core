@@ -105,7 +105,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${failsafe-plugin-version}</version>
                 <configuration>
-                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED -Djetty.port=${jetty.port}</argLine>
                 </configuration>
                 <executions>
                     <execution>
