@@ -1,0 +1,56 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..eb15727a9 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -34,7 +34,6 @@
+     </build>
+     <profiles>
+         <profile>
+-            <!-- this is used during release (see CI/CI.md file for details) to prepare javadocs for publishing to gh-pages -->
+             <id>release</id>
+             <build>
+                 <plugins>
+@@ -59,9 +58,33 @@
+                             </execution>
+                         </executions>
+                     </plugin>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-javadoc-plugin</artifactId>
++                        <executions>
++                            <execution>
++                                <id>generate-apidocs</id>
++                                <phase>prepare-package</phase>
++                                <goals>
++                                    <goal>javadoc</goal>
++                                </goals>
++                                <configuration>
++                                    <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
++                                    <destDir>apidocs</destDir>
++                                    <source>1.8</source>
++                                    <encoding>UTF-8</encoding>
++                                    <maxmemory>1g</maxmemory>
++                                    <links>
++                                        <link>https://docs.oracle.com/javase/8/docs/api</link>
++                                    </links>
++                                    <excludePackageNames>${javadoc.package.exclude}</excludePackageNames>
++                                    <quiet>true</quiet>
++                                </configuration>
++                            </execution>
++                        </executions>
++                    </plugin>
+                     <plugin>
+                         <artifactId>maven-resources-plugin</artifactId>
+-                        <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
+                         <version>3.1.0</version>
+                         <executions>
+                             <execution>
+@@ -75,7 +98,7 @@
+                                     <resources>
+                                         <resource>
+                                             <directory>${project.build.directory}/apidocs</directory>
+-                                            <filtering>true</filtering>
++                                            <filtering>false</filtering>
+                                         </resource>
+                                     </resources>
+                                 </configuration>
