@@ -1,0 +1,19 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..cbb8e2c9e 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -14,6 +14,14 @@
+         <sourceDirectory>src/main/java</sourceDirectory>
+         <defaultGoal>install</defaultGoal>
+         <plugins>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-compiler-plugin</artifactId>
++                <version>3.11.0</version>
++                <configuration>
++                    <release>17</release>
++                </configuration>
++            </plugin>
+             <plugin>
+                 <groupId>biz.aQute.bnd</groupId>
+                 <artifactId>bnd-maven-plugin</artifactId>
