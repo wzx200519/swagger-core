@@ -1,0 +1,31 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..b7c7efc8b 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -11,8 +11,6 @@
+     <name>swagger-annotations</name>
+     <description>swagger-annotations</description>
+     <build>
+-        <sourceDirectory>src/main/java</sourceDirectory>
+-        <defaultGoal>install</defaultGoal>
+         <plugins>
+             <plugin>
+                 <groupId>biz.aQute.bnd</groupId>
+@@ -61,8 +59,7 @@
+                     </plugin>
+                     <plugin>
+                         <artifactId>maven-resources-plugin</artifactId>
+-                        <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
+-                        <version>3.1.0</version>
++                        <version>3.3.1</version>
+                         <executions>
+                             <execution>
+                                 <id>copy-resources</id>
+@@ -90,6 +87,7 @@
+         <dependency>
+             <groupId>jakarta.ws.rs</groupId>
+             <artifactId>jakarta.ws.rs-api</artifactId>
++            <version>3.1.0</version>
+             <scope>test</scope>
+         </dependency>
+         <dependency>
