@@ -60,22 +60,41 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-release-apidocs</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                                <configuration>
+                                    <aggregate>false</aggregate>
+                                    <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
+                                    <destDir>apidocs</destDir>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
                         <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>copy-resources</id>
-                                <phase>deploy</phase>
+                                <phase>verify</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
                                     <outputDirectory>${project.build.directory}/javadocprep/swagger-core/${project.version}/apidocs</outputDirectory>
+                                    <overwrite>true</overwrite>
                                     <resources>
                                         <resource>
                                             <directory>${project.build.directory}/apidocs</directory>
-                                            <filtering>true</filtering>
+                                            <filtering>false</filtering>
                                         </resource>
                                     </resources>
                                 </configuration>

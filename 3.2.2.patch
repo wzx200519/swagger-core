@@ -1,0 +1,73 @@
+diff --git a/CI/prepare-javadocs.sh b/CI/prepare-javadocs.sh
+index 68fc53734..3656ac7be 100755
+--- a/CI/prepare-javadocs.sh
++++ b/CI/prepare-javadocs.sh
+@@ -4,11 +4,14 @@ CUR=$(pwd)
+ TMPDIR="$(dirname -- "${0}")"
+ 
+ SC_RELEASE_TAG="v$SC_VERSION"
++SOURCE_DIR="$CUR/modules/swagger-annotations/target/javadocprep/swagger-core/${SC_VERSION}/apidocs"
+ 
+-#####################
+-### publish javadocs
+-#####################
++if [ ! -d "$SOURCE_DIR" ]; then
++  echo "Missing generated javadocs at $SOURCE_DIR"
++  find "$CUR/modules/swagger-annotations/target" -maxdepth 3 \( -type d -o -type f \) | sort
++  exit 1
++fi
+ 
+-cp -aR $CUR/modules/swagger-annotations/target/javadocprep/swagger-core/${SC_VERSION}/apidocs $TMPDIR
+-cp -a $CUR/CI/publish-javadocs.sh $TMPDIR/publish-javadocs.sh
++cp -aR "$SOURCE_DIR" "$TMPDIR"
++cp -a "$CUR/CI/publish-javadocs.sh" "$TMPDIR/publish-javadocs.sh"
+ 
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..97a6f792b 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -59,6 +59,24 @@
+                             </execution>
+                         </executions>
+                     </plugin>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-javadoc-plugin</artifactId>
++                        <executions>
++                            <execution>
++                                <id>prepare-release-apidocs</id>
++                                <phase>prepare-package</phase>
++                                <goals>
++                                    <goal>javadoc</goal>
++                                </goals>
++                                <configuration>
++                                    <aggregate>false</aggregate>
++                                    <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
++                                    <destDir>apidocs</destDir>
++                                </configuration>
++                            </execution>
++                        </executions>
++                    </plugin>
+                     <plugin>
+                         <artifactId>maven-resources-plugin</artifactId>
+                         <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
+@@ -66,16 +84,17 @@
+                         <executions>
+                             <execution>
+                                 <id>copy-resources</id>
+-                                <phase>deploy</phase>
++                                <phase>verify</phase>
+                                 <goals>
+                                     <goal>copy-resources</goal>
+                                 </goals>
+                                 <configuration>
+                                     <outputDirectory>${project.build.directory}/javadocprep/swagger-core/${project.version}/apidocs</outputDirectory>
++                                    <overwrite>true</overwrite>
+                                     <resources>
+                                         <resource>
+                                             <directory>${project.build.directory}/apidocs</directory>
+-                                            <filtering>true</filtering>
++                                            <filtering>false</filtering>
+                                         </resource>
+                                     </resources>
+                                 </configuration>
