@@ -34,7 +34,6 @@
     </build>
     <profiles>
         <profile>
-            <!-- this is used during release (see CI/CI.md file for details) to prepare javadocs for publishing to gh-pages -->
             <id>release</id>
             <build>
                 <plugins>
@@ -60,10 +59,69 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>io.swagger.core.v3</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${project.version}</version>
+                        <configuration>
+                            <outputFileName>openapi</outputFileName>
+                            <outputPath>${project.build.directory}/generated-openapi</outputPath>
+                            <outputFormat>JSON</outputFormat>
+                            <resourcePackages>
+                                <package>io.swagger.v3.oas.annotations.test</package>
+                            </resourcePackages>
+                            <prettyPrint>true</prettyPrint>
+                            <readAllResources>true</readAllResources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>generate-openapi-spec</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>resolve</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.swagger.core.v3</groupId>
+                                <artifactId>swagger-jaxrs2</artifactId>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.swagger.core.v3</groupId>
+                                <artifactId>swagger-core</artifactId>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.swagger.core.v3</groupId>
+                                <artifactId>swagger-models</artifactId>
+                                <version>${project.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
                         <version>3.1.0</version>
                         <executions>
+                            <execution>
+                                <id>copy-openapi-spec</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/javadocprep/swagger-core/${project.version}/apidocs</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}/generated-openapi</directory>
+                                            <filtering>false</filtering>
+                                            <includes>
+                                                <include>openapi.json</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>copy-resources</id>
                                 <phase>deploy</phase>
@@ -95,6 +153,16 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
