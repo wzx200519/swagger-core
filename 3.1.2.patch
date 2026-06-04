@@ -1,0 +1,136 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..2fbc17c74 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -34,7 +34,6 @@
+     </build>
+     <profiles>
+         <profile>
+-            <!-- this is used during release (see CI/CI.md file for details) to prepare javadocs for publishing to gh-pages -->
+             <id>release</id>
+             <build>
+                 <plugins>
+@@ -45,6 +44,7 @@
+                         <executions>
+                             <execution>
+                                 <id>enforce-no-snapshots</id>
++                                <phase>validate</phase>
+                                 <goals>
+                                     <goal>enforce</goal>
+                                 </goals>
+@@ -59,13 +59,99 @@
+                             </execution>
+                         </executions>
+                     </plugin>
++                    <plugin>
++                        <groupId>org.codehaus.gmavenplus</groupId>
++                        <artifactId>gmavenplus-plugin</artifactId>
++                        <version>4.3.1</version>
++                        <executions>
++                            <execution>
++                                <id>generate-openapi-from-test-sources</id>
++                                <phase>process-test-classes</phase>
++                                <goals>
++                                    <goal>execute</goal>
++                                </goals>
++                                <configuration>
++                                    <includeClasspath>PROJECT_AND_PLUGIN</includeClasspath>
++                                    <scripts>
++                                        <script><![CDATA[
++import io.swagger.v3.core.util.Json
++import io.swagger.v3.jaxrs2.Reader
++import io.swagger.v3.oas.integration.SwaggerConfiguration
++import io.swagger.v3.oas.models.OpenAPI
++import java.nio.charset.StandardCharsets
++import java.nio.file.Files
++import java.nio.file.Path
++import java.nio.file.Paths
++
++Path testOutputDirectory = Paths.get(project.build.testOutputDirectory)
++if (!Files.exists(testOutputDirectory)) {
++    throw new IllegalStateException("Test classes directory does not exist: ${testOutputDirectory}")
++}
++
++Set<Class<?>> resourceClasses = new LinkedHashSet<>()
++ClassLoader classLoader = Thread.currentThread().contextClassLoader
++
++Files.walk(testOutputDirectory)
++        .filter { Files.isRegularFile(it) }
++        .filter { it.fileName.toString().endsWith('.class') }
++        .filter { !it.fileName.toString().contains('$') }
++        .forEach { classFile ->
++            String className = testOutputDirectory
++                    .relativize(classFile)
++                    .toString()
++                    .replace(java.io.File.separatorChar, '.' as char)
++                    .replaceAll(/\.class$/, '')
++            Class<?> candidate = classLoader.loadClass(className)
++            if (candidate.getAnnotation(jakarta.ws.rs.Path) != null
++                    || candidate.getAnnotation(jakarta.ws.rs.ApplicationPath) != null
++                    || candidate.getAnnotation(io.swagger.v3.oas.annotations.OpenAPIDefinition) != null
++                    || candidate.getAnnotation(io.swagger.v3.oas.annotations.Webhooks) != null) {
++                resourceClasses.add(candidate)
++            }
++        }
++
++if (resourceClasses.isEmpty()) {
++    throw new IllegalStateException("No Jakarta REST/OpenAPI annotated test classes were found under ${testOutputDirectory}")
++}
++
++SwaggerConfiguration configuration = new SwaggerConfiguration()
++configuration.setOpenAPI(new OpenAPI().openapi('3.0.3'))
++configuration.setOpenAPIVersion('3.0.3')
++configuration.setOpenAPI31(Boolean.FALSE)
++configuration.setPrettyPrint(Boolean.TRUE)
++configuration.setReadAllResources(Boolean.TRUE)
++
++OpenAPI openAPI = new Reader(configuration).read(resourceClasses)
++Path outputDirectory = Paths.get(project.build.directory, 'generated-openapi')
++Files.createDirectories(outputDirectory)
++Path outputFile = outputDirectory.resolve('openapi.json')
++Files.write(outputFile, Json.pretty(openAPI).getBytes(StandardCharsets.UTF_8))
++log.info("Generated OpenAPI document: ${outputFile.toAbsolutePath()}")
++]]></script>
++                                    </scripts>
++                                </configuration>
++                            </execution>
++                        </executions>
++                        <dependencies>
++                            <dependency>
++                                <groupId>org.apache.groovy</groupId>
++                                <artifactId>groovy</artifactId>
++                                <version>4.0.26</version>
++                                <scope>runtime</scope>
++                            </dependency>
++                            <dependency>
++                                <groupId>io.swagger.core.v3</groupId>
++                                <artifactId>swagger-jaxrs2-jakarta</artifactId>
++                                <version>${project.version}</version>
++                            </dependency>
++                        </dependencies>
++                    </plugin>
+                     <plugin>
+                         <artifactId>maven-resources-plugin</artifactId>
+-                        <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
+                         <version>3.1.0</version>
+                         <executions>
+                             <execution>
+-                                <id>copy-resources</id>
++                                <id>copy-release-site-assets</id>
+                                 <phase>deploy</phase>
+                                 <goals>
+                                     <goal>copy-resources</goal>
+@@ -77,6 +163,13 @@
+                                             <directory>${project.build.directory}/apidocs</directory>
+                                             <filtering>true</filtering>
+                                         </resource>
++                                        <resource>
++                                            <directory>${project.build.directory}/generated-openapi</directory>
++                                            <includes>
++                                                <include>openapi.json</include>
++                                            </includes>
++                                            <filtering>false</filtering>
++                                        </resource>
+                                     </resources>
+                                 </configuration>
+                             </execution>
