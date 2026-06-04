@@ -60,13 +60,12 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
-                        <version>3.1.0</version>
                         <executions>
                             <execution>
-                                <id>copy-resources</id>
-                                <phase>deploy</phase>
+                                <id>copy-javadocs</id>
+                                <phase>install</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -75,7 +74,6 @@
                                     <resources>
                                         <resource>
                                             <directory>${project.build.directory}/apidocs</directory>
-                                            <filtering>true</filtering>
                                         </resource>
                                     </resources>
                                 </configuration>
@@ -90,7 +88,6 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
