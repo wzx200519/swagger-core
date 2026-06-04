@@ -106,6 +106,9 @@
                 <version>${failsafe-plugin-version}</version>
                 <configuration>
                     <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                    <systemPropertyVariables>
+                        <jetty.port>${jetty.port}</jetty.port>
+                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>
@@ -113,11 +116,6 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <jetty.port>${jetty.port}</jetty.port>
-                            </systemPropertyVariables>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
