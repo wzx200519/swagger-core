@@ -1,0 +1,27 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..3ad187694 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -1,5 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0"
++         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <parent>
+         <groupId>io.swagger.core.v3</groupId>
+         <artifactId>swagger-project</artifactId>
+@@ -18,6 +20,13 @@
+                 <groupId>biz.aQute.bnd</groupId>
+                 <artifactId>bnd-maven-plugin</artifactId>
+             </plugin>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-compiler-plugin</artifactId>
++                <configuration>
++                    <release>17</release>
++                </configuration>
++            </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-jar-plugin</artifactId>
