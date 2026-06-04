@@ -60,13 +60,38 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.7.0</version>
+                        <executions>
+                            <execution>
+                                <id>generate-javadocs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                                <configuration>
+                                    <source>1.8</source>
+                                    <encoding>UTF-8</encoding>
+                                    <maxmemory>1g</maxmemory>
+                                    <links>
+                                        <link>https://docs.oracle.com/javase/8/docs/api</link>
+                                    </links>
+                                    <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
+                                    <destDir>apidocs</destDir>
+                                    <show>private</show>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
                         <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>copy-resources</id>
-                                <phase>deploy</phase>
+                                <phase>install</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -75,7 +100,7 @@
                                     <resources>
                                         <resource>
                                             <directory>${project.build.directory}/apidocs</directory>
-                                            <filtering>true</filtering>
+                                            <filtering>false</filtering>
                                         </resource>
                                     </resources>
                                 </configuration>
