@@ -1,0 +1,13 @@
+diff --git a/modules/swagger-jaxrs2/pom.xml b/modules/swagger-jaxrs2/pom.xml
+index eb501f299..fda491e28 100644
+--- a/modules/swagger-jaxrs2/pom.xml
++++ b/modules/swagger-jaxrs2/pom.xml
+@@ -105,7 +105,7 @@
+                 <artifactId>maven-failsafe-plugin</artifactId>
+                 <version>${failsafe-plugin-version}</version>
+                 <configuration>
+-                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED -Djetty.port=${jetty.port}</argLine>
+                 </configuration>
+                 <executions>
+                     <execution>
