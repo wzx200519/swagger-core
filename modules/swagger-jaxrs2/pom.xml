@@ -98,7 +98,6 @@
                 <configuration>
                     <argLine>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                     <forkCount>0</forkCount>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -295,7 +294,3 @@
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>${jackson-version}</version>
-        </dependency>
-    </dependencies>
-</project>
