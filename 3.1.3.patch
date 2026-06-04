@@ -1,0 +1,63 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..63d8ef7ad 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -34,6 +34,7 @@
+     </build>
+     <profiles>
+         <profile>
++            <!-- this is used during release (see CI/CI.md file for details) to prepare javadocs for publishing to gh-pages -->
+             <!-- this is used during release (see CI/CI.md file for details) to prepare javadocs for publishing to gh-pages -->
+             <id>release</id>
+             <build>
+@@ -44,7 +45,6 @@
+                         <version>${enforcer-plugin-version}</version>
+                         <executions>
+                             <execution>
+-                                <id>enforce-no-snapshots</id>
+                                 <goals>
+                                     <goal>enforce</goal>
+                                 </goals>
+@@ -60,42 +60,4 @@
+                         </executions>
+                     </plugin>
+                     <plugin>
+-                        <artifactId>maven-resources-plugin</artifactId>
+                         <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
+-                        <version>3.1.0</version>
+-                        <executions>
+-                            <execution>
+-                                <id>copy-resources</id>
+-                                <phase>deploy</phase>
+-                                <goals>
+-                                    <goal>copy-resources</goal>
+-                                </goals>
+-                                <configuration>
+-                                    <outputDirectory>${project.build.directory}/javadocprep/swagger-core/${project.version}/apidocs</outputDirectory>
+-                                    <resources>
+-                                        <resource>
+-                                            <directory>${project.build.directory}/apidocs</directory>
+-                                            <filtering>true</filtering>
+-                                        </resource>
+-                                    </resources>
+-                                </configuration>
+-                            </execution>
+-                        </executions>
+-                    </plugin>
+-                </plugins>
+-            </build>
+-        </profile>
+-    </profiles>
+-    <dependencies>
+-        <dependency>
+-            <groupId>jakarta.ws.rs</groupId>
+-            <artifactId>jakarta.ws.rs-api</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.testng</groupId>
+-            <artifactId>testng</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-    </dependencies>
+-</project>
