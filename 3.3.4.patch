@@ -1,0 +1,62 @@
+diff --git a/modules/swagger-annotations/pom.xml b/modules/swagger-annotations/pom.xml
+index 3c1f9aa98..9fc1ad204 100644
+--- a/modules/swagger-annotations/pom.xml
++++ b/modules/swagger-annotations/pom.xml
+@@ -10,9 +10,10 @@
+     <artifactId>swagger-annotations</artifactId>
+     <name>swagger-annotations</name>
+     <description>swagger-annotations</description>
++    <properties>
++        <jakarta.ws-version>3.1.0</jakarta.ws-version>
++    </properties>
+     <build>
+-        <sourceDirectory>src/main/java</sourceDirectory>
+-        <defaultGoal>install</defaultGoal>
+         <plugins>
+             <plugin>
+                 <groupId>biz.aQute.bnd</groupId>
+@@ -24,9 +25,6 @@
+                 <configuration>
+                     <archive>
+                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+-                        <manifestEntries>
+-                            <Automatic-Module-Name>io.swagger.v3.oas.annotations</Automatic-Module-Name>
+-                        </manifestEntries>
+                     </archive>
+                 </configuration>
+             </plugin>
+@@ -34,7 +32,6 @@
+     </build>
+     <profiles>
+         <profile>
+-            <!-- this is used during release (see CI/CI.md file for details) to prepare javadocs for publishing to gh-pages -->
+             <id>release</id>
+             <build>
+                 <plugins>
+@@ -60,9 +57,9 @@
+                         </executions>
+                     </plugin>
+                     <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-resources-plugin</artifactId>
+-                        <!-- keep 3.1.0 until root cause of error is identified. see https://issues.apache.org/jira/browse/MRESOURCES-265 -->
+-                        <version>3.1.0</version>
++                        <version>3.3.1</version>
+                         <executions>
+                             <execution>
+                                 <id>copy-resources</id>
+@@ -90,7 +87,6 @@
+         <dependency>
+             <groupId>jakarta.ws.rs</groupId>
+             <artifactId>jakarta.ws.rs-api</artifactId>
+-            <scope>test</scope>
+         </dependency>
+         <dependency>
+             <groupId>org.testng</groupId>
+@@ -98,4 +94,4 @@
+             <scope>test</scope>
+         </dependency>
+     </dependencies>
+-</project>
++</project>
+\ No newline at end of file
