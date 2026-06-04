@@ -1,0 +1,50 @@
+diff --git a/modules/swagger-jaxrs2/pom.xml b/modules/swagger-jaxrs2/pom.xml
+index eb501f299..7e091f804 100644
+--- a/modules/swagger-jaxrs2/pom.xml
++++ b/modules/swagger-jaxrs2/pom.xml
+@@ -96,8 +96,9 @@
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <version>${surefire-version}</version>
+                 <configuration>
+-                    <argLine>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+-                    <forkCount>0</forkCount>
++                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                    <forkCount>1</forkCount>
++                    <reuseForks>true</reuseForks>
+                 </configuration>
+             </plugin>
+             <plugin>
+@@ -296,6 +297,20 @@
+             <groupId>com.fasterxml.jackson.jaxrs</groupId>
+             <artifactId>jackson-jaxrs-json-provider</artifactId>
+             <version>${jackson-version}</version>
++            <exclusions>
++                <exclusion>
++                    <groupId>com.fasterxml.jackson.core</groupId>
++                    <artifactId>jackson-core</artifactId>
++                </exclusion>
++                <exclusion>
++                    <groupId>com.fasterxml.jackson.core</groupId>
++                    <artifactId>jackson-databind</artifactId>
++                </exclusion>
++                <exclusion>
++                    <groupId>com.fasterxml.jackson.core</groupId>
++                    <artifactId>jackson-annotations</artifactId>
++                </exclusion>
++            </exclusions>
+         </dependency>
+     </dependencies>
+ </project>
+diff --git a/pom.xml b/pom.xml
+index 0c1472e82..b3819f62c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -636,7 +636,7 @@
+         <servlet-api-version>4.0.4</servlet-api-version>
+         <jersey2-version>2.46</jersey2-version>
+         <jackson-version>2.21.1</jackson-version>
+-        <jackson-annotations-version>2.21</jackson-annotations-version>
++        <jackson-annotations-version>2.21.1</jackson-annotations-version>
+         <jackson-databind-version>2.21.1</jackson-databind-version>
+         <logback-version>1.5.32</logback-version>
+         <classgraph-version>4.8.184</classgraph-version>
