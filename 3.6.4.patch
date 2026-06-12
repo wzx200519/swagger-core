@@ -2,19 +2,130 @@ diff --git a/modules/swagger-jaxrs2/pom.xml b/modules/swagger-jaxrs2/pom.xml
 index eb501f299..3b08ef372 100644
 --- a/modules/swagger-jaxrs2/pom.xml
 +++ b/modules/swagger-jaxrs2/pom.xml
-@@ -98,7 +98,6 @@
+@@ -95,13 +95,14 @@
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <version>${surefire-version}</version>
                  <configuration>
-                     <argLine>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
-                     <forkCount>0</forkCount>
--                </configuration>
+                     <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                     <forkCount>1</forkCount>
++                    <reuseForks>false</reuseForks>
+                 </configuration>
              </plugin>
              <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
-@@ -295,7 +294,3 @@
+                 <artifactId>maven-failsafe-plugin</artifactId>
+                 <version>${failsafe-plugin-version}</version>
+@@ -294,11 +295,11 @@
+         </dependency>
          <dependency>
              <groupId>com.fasterxml.jackson.jaxrs</groupId>
              <artifactId>jackson-jaxrs-json-provider</artifactId>
--            <version>${jackson-version}</version>
--        </dependency>
--    </dependencies>
--</project>
+             <version>${jackson-version}</version>
+             <scope>test</scope>
+             <exclusions>
+                 <exclusion>
+                     <groupId>com.fasterxml.jackson.core</groupId>
+                     <artifactId>jackson-databind</artifactId>
+                 </exclusion>
+diff --git a/modules/swagger-jaxrs2-servlet-initializer/pom.xml b/modules/swagger-jaxrs2-servlet-initializer/pom.xml
+index a1b2c3d4e..f5g6h7i8j 100644
+--- a/modules/swagger-jaxrs2-servlet-initializer/pom.xml
++++ b/modules/swagger-jaxrs2-servlet-initializer/pom.xml
+@@ -62,13 +62,25 @@
+                 </executions>
+             </plugin>
+             <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-surefire-plugin</artifactId>
++                <version>${surefire-version}</version>
++                <configuration>
++                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                    <forkCount>1</forkCount>
++                    <reuseForks>false</reuseForks>
++                </configuration>
++            </plugin>
++            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-failsafe-plugin</artifactId>
+                 <version>${failsafe-plugin-version}</version>
++                <configuration>
++                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                </configuration>
++                <executions>
++                    <execution>
++                        <goals>
+                             <goal>integration-test</goal>
+                             <goal>verify</goal>
+                         </goals>
+                         <configuration>
+@@ -76,6 +88,8 @@
+                                 <jetty.port>${jetty.port}</jetty.port>
+                             </systemPropertyVariables>
+                         </configuration>
+                     </execution>
+                 </executions>
++                    </execution>
++                </executions>
+             </plugin>
+             <plugin>
+                 <groupId>org.eclipse.jetty</groupId>
+diff --git a/modules/swagger-jaxrs2-servlet-initializer-v2/pom.xml b/modules/swagger-jaxrs2-servlet-initializer-v2/pom.xml
+index k9l0m1n2o..p3q4r5s6t 100644
+--- a/modules/swagger-jaxrs2-servlet-initializer-v2/pom.xml
++++ b/modules/swagger-jaxrs2-servlet-initializer-v2/pom.xml
+@@ -58,13 +58,25 @@
+                 </executions>
+             </plugin>
+             <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-surefire-plugin</artifactId>
++                <version>${surefire-version}</version>
++                <configuration>
++                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                    <forkCount>1</forkCount>
++                    <reuseForks>false</reuseForks>
++                </configuration>
++            </plugin>
++            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-failsafe-plugin</artifactId>
+                 <version>${failsafe-plugin-version}</version>
++                <configuration>
++                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                </configuration>
++                <executions>
++                    <execution>
++                        <goals>
+                             <goal>integration-test</goal>
+                             <goal>verify</goal>
+                         </goals>
+                         <configuration>
+@@ -72,6 +84,8 @@
+                                 <jetty.port>${jetty.port}</jetty.port>
+                             </systemPropertyVariables>
+                         </configuration>
+                     </execution>
+                 </executions>
++                    </execution>
++                </executions>
+             </plugin>
+             <plugin>
+                 <groupId>org.eclipse.jetty</groupId>
+diff --git a/pom.xml b/pom.xml
+index 123456789..abcdef012 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -638,7 +638,7 @@
+         <jakarta.xml.bind-api-version>2.3.3</jakarta.xml.bind-api-version>
+         <jakarta.activation-api-version>1.2.2</jakarta.activation-api-version>
+         <bnd-version>6.4.0</bnd-version>
+         <servlet-api-version>4.0.4</servlet-api-version>
+         <jersey2-version>2.46</jersey2-version>
+         <jackson-version>2.21.1</jackson-version>
+-        <jackson-annotations-version>2.21</jackson-annotations-version>
++        <jackson-annotations-version>2.21.1</jackson-annotations-version>
+         <jackson-databind-version>2.21.1</jackson-databind-version>
+         <logback-version>1.5.32</logback-version>
+         <classgraph-version>4.8.184</classgraph-version>
