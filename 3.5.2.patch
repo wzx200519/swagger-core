@@ -1,13 +1,59 @@
+diff --git a/3.5.2.patch b/3.5.2.patch
+index 67219c25c..b52aed61f 100644
+--- a/3.5.2.patch
++++ b/3.5.2.patch
+@@ -2,27 +2,12 @@ diff --git a/modules/swagger-jaxrs2/pom.xml b/modules/swagger-jaxrs2/pom.xml
+ index eb501f299..b56ead97c 100644
+ --- a/modules/swagger-jaxrs2/pom.xml
+ +++ b/modules/swagger-jaxrs2/pom.xml
+-@@ -105,18 +105,16 @@
++@@ -105,7 +105,7 @@
+                  <artifactId>maven-failsafe-plugin</artifactId>
+                  <version>${failsafe-plugin-version}</version>
+                  <configuration>
+ -                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+ +                    <argLine>-Djetty.port=${jetty.port} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+-+                    <systemPropertyVariables>
+-+                        <jetty.port>${jetty.port}</jetty.port>
+-+                    </systemPropertyVariables>
+                  </configuration>
+                  <executions>
+                      <execution>
+-                         <goals>
+-                             <goal>integration-test</goal>
+-                             <goal>verify</goal>
+-                         </goals>
+--                        <configuration>
+--                            <systemPropertyVariables>
+--                                <jetty.port>${jetty.port}</jetty.port>
+--                            </systemPropertyVariables>
+--                        </configuration>
+-                     </execution>
+-                 </executions>
+-             </plugin>
 diff --git a/modules/swagger-jaxrs2/pom.xml b/modules/swagger-jaxrs2/pom.xml
-index eb501f299..b56ead97c 100644
+index 696d56dc2..b56ead97c 100644
 --- a/modules/swagger-jaxrs2/pom.xml
 +++ b/modules/swagger-jaxrs2/pom.xml
-@@ -105,7 +105,7 @@
-                 <artifactId>maven-failsafe-plugin</artifactId>
+@@ -106,9 +106,6 @@
                  <version>${failsafe-plugin-version}</version>
                  <configuration>
--                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
-+                    <argLine>-Djetty.port=${jetty.port} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                     <argLine>-Djetty.port=${jetty.port} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+-                    <systemPropertyVariables>
+-                        <jetty.port>${jetty.port}</jetty.port>
+-                    </systemPropertyVariables>
                  </configuration>
                  <executions>
                      <execution>
+@@ -116,6 +113,11 @@
+                             <goal>integration-test</goal>
+                             <goal>verify</goal>
+                         </goals>
++                        <configuration>
++                            <systemPropertyVariables>
++                                <jetty.port>${jetty.port}</jetty.port>
++                            </systemPropertyVariables>
++                        </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
