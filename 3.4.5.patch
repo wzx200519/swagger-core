@@ -17,3 +17,170 @@ index 3c1f9aa98..cbb8e2c9e 100644
              <plugin>
                  <groupId>biz.aQute.bnd</groupId>
                  <artifactId>bnd-maven-plugin</artifactId>
+diff --git a/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/enums/Stability.java b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/enums/Stability.java
+new file mode 100644
+index 000000000..e69de29bb
+--- /dev/null
++++ b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/enums/Stability.java
+@@ -0,0 +1,7 @@
++package io.swagger.v3.oas.annotations.enums;
++
++public enum Stability {
++    EXPERIMENTAL,
++    STABLE,
++    DEPRECATED;
++}
+diff --git a/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/ApiStability.java b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/ApiStability.java
+new file mode 100644
+index 000000000..e69de29bb
+--- /dev/null
++++ b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/ApiStability.java
+@@ -0,0 +1,20 @@
++package io.swagger.v3.oas.annotations;
++
++import io.swagger.v3.oas.annotations.enums.Stability;
++
++import java.lang.annotation.Retention;
++import java.lang.annotation.RetentionPolicy;
++import java.lang.annotation.Target;
++
++import static java.lang.annotation.ElementType.METHOD;
++import static java.lang.annotation.ElementType.TYPE;
++
++/**
++ * Marks a given resource class or method with a stability level, indicating the
++ * maturity and expected compatibility guarantees of the API element.
++ **/
++@Target({TYPE, METHOD})
++@Retention(RetentionPolicy.RUNTIME)
++public @interface ApiStability {
++    Stability value() default Stability.STABLE;
++}
+diff --git a/modules/swagger-annotations/src/test/java/io/swagger/v3/oas/annotations/ApiStabilityTest.java b/modules/swagger-annotations/src/test/java/io/swagger/v3/oas/annotations/ApiStabilityTest.java
+new file mode 100644
+index 000000000..e69de29bb
+--- /dev/null
++++ b/modules/swagger-annotations/src/test/java/io/swagger/v3/oas/annotations/ApiStabilityTest.java
+@@ -0,0 +1,122 @@
++package io.swagger.v3.oas.annotations;
++
++import io.swagger.v3.oas.annotations.enums.Stability;
++import org.testng.annotations.Test;
++
++import java.lang.reflect.Method;
++
++import static org.testng.Assert.*;
++
++public class ApiStabilityTest {
++
++    @ApiStability(Stability.EXPERIMENTAL)
++    private static class ExperimentalApi {}
++
++    @ApiStability(Stability.STABLE)
++    private static class StableApi {}
++
++    @ApiStability(Stability.DEPRECATED)
++    private static class DeprecatedApi {}
++
++    @ApiStability
++    private static class DefaultApi {}
++
++    private static class AnnotatedMethods {
++        @ApiStability(Stability.EXPERIMENTAL)
++        public void experimentalMethod() {}
++
++        @ApiStability(Stability.STABLE)
++        public void stableMethod() {}
++
++        @ApiStability(Stability.DEPRECATED)
++        public void deprecatedMethod() {}
++
++        @ApiStability
++        public void defaultMethod() {}
++    }
++
++    @Test
++    public void testAnnotationOnClassWithExperimental() {
++        ApiStability annotation = ExperimentalApi.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.EXPERIMENTAL);
++    }
++
++    @Test
++    public void testAnnotationOnClassWithStable() {
++        ApiStability annotation = StableApi.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.STABLE);
++    }
++
++    @Test
++    public void testAnnotationOnClassWithDeprecated() {
++        ApiStability annotation = DeprecatedApi.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.DEPRECATED);
++    }
++
++    @Test
++    public void testAnnotationDefaultValue() {
++        ApiStability annotation = DefaultApi.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.STABLE);
++    }
++
++    @Test
++    public void testAnnotationOnMethodExperimental() throws NoSuchMethodException {
++        Method method = AnnotatedMethods.class.getMethod("experimentalMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.EXPERIMENTAL);
++    }
++
++    @Test
++    public void testAnnotationOnMethodStable() throws NoSuchMethodException {
++        Method method = AnnotatedMethods.class.getMethod("stableMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.STABLE);
++    }
++
++    @Test
++    public void testAnnotationOnMethodDeprecated() throws NoSuchMethodException {
++        Method method = AnnotatedMethods.class.getMethod("deprecatedMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.DEPRECATED);
++    }
++
++    @Test
++    public void testAnnotationOnMethodDefaultValue() throws NoSuchMethodException {
++        Method method = AnnotatedMethods.class.getMethod("defaultMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), Stability.STABLE);
++    }
++
++    @Test
++    public void testStabilityEnumValues() {
++        Stability[] values = Stability.values();
++        assertEquals(values.length, 3);
++        assertEquals(Stability.EXPERIMENTAL, Stability.valueOf("EXPERIMENTAL"));
++        assertEquals(Stability.STABLE, Stability.valueOf("STABLE"));
++        assertEquals(Stability.DEPRECATED, Stability.valueOf("DEPRECATED"));
++    }
++
++    @Test
++    public void testAnnotationTargetTypeAndMethod() throws NoSuchMethodException {
++        assertNotNull(ApiStability.class.getAnnotation(java.lang.annotation.Target.class));
++        assertNotNull(DefaultApi.class.getAnnotation(ApiStability.class));
++        assertNotNull(AnnotatedMethods.class.getMethod("stableMethod").getAnnotation(ApiStability.class));
++    }
++
++    @Test
++    public void testAnnotationRetentionRuntime() {
++        assertNotNull(ApiStability.class.getAnnotation(java.lang.annotation.Retention.class));
++        assertEquals(
++            ApiStability.class.getAnnotation(java.lang.annotation.Retention.class).value(),
++            java.lang.annotation.RetentionPolicy.RUNTIME
++        );
++    }
++}
