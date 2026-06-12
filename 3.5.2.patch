@@ -2,12 +2,27 @@ diff --git a/modules/swagger-jaxrs2/pom.xml b/modules/swagger-jaxrs2/pom.xml
 index eb501f299..b56ead97c 100644
 --- a/modules/swagger-jaxrs2/pom.xml
 +++ b/modules/swagger-jaxrs2/pom.xml
-@@ -105,7 +105,7 @@
+@@ -105,18 +105,16 @@
                  <artifactId>maven-failsafe-plugin</artifactId>
                  <version>${failsafe-plugin-version}</version>
                  <configuration>
 -                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 +                    <argLine>-Djetty.port=${jetty.port} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
++                    <systemPropertyVariables>
++                        <jetty.port>${jetty.port}</jetty.port>
++                    </systemPropertyVariables>
                  </configuration>
                  <executions>
                      <execution>
+                         <goals>
+                             <goal>integration-test</goal>
+                             <goal>verify</goal>
+                         </goals>
+-                        <configuration>
+-                            <systemPropertyVariables>
+-                                <jetty.port>${jetty.port}</jetty.port>
+-                            </systemPropertyVariables>
+-                        </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
