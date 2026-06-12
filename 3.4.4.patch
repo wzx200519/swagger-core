@@ -17,3 +17,211 @@ index 3c1f9aa98..2c25cab6a 100644
              <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-jar-plugin</artifactId>
+@@ -25,6 +33,9 @@
+                     <archive>
+                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
++                        <manifestEntries>
++                            <Automatic-Module-Name>io.swagger.v3.oas.annotations</Automatic-Module-Name>
++                        </manifestEntries>
+                     </archive>
+                 </configuration>
+             </plugin>
+diff --git a/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/enums/ApiStabilityLevel.java b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/enums/ApiStabilityLevel.java
+new file mode 100644
+index 000000000..a1b2c3d4e
+--- /dev/null
++++ b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/enums/ApiStabilityLevel.java
+@@ -0,0 +1,7 @@
++package io.swagger.v3.oas.annotations.enums;
++
++public enum ApiStabilityLevel {
++    EXPERIMENTAL,
++    STABLE,
++    DEPRECATED
++}
+diff --git a/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/ApiStability.java b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/ApiStability.java
+new file mode 100644
+index 000000000..f9e8d7c6b
+--- /dev/null
++++ b/modules/swagger-annotations/src/main/java/io/swagger/v3/oas/annotations/ApiStability.java
+@@ -0,0 +1,41 @@
++package io.swagger.v3.oas.annotations;
++
++import io.swagger.v3.oas.annotations.enums.ApiStabilityLevel;
++
++import java.lang.annotation.Inherited;
++import java.lang.annotation.Retention;
++import java.lang.annotation.RetentionPolicy;
++import java.lang.annotation.Target;
++
++import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
++import static java.lang.annotation.ElementType.METHOD;
++import static java.lang.annotation.ElementType.TYPE;
++
++/**
++ * The annotation may be used to mark an API's stability level, indicating the maturity
++ * and expected longevity of the annotated resource class, bean type, or resource method.
++ *
++ * <p>Possible values:</p>
++ * <ul>
++ * <li>{@link ApiStabilityLevel#EXPERIMENTAL EXPERIMENTAL} - The API is experimental and may change or be removed without notice.</li>
++ * <li>{@link ApiStabilityLevel#STABLE STABLE} - The API is stable and safe for production use.</li>
++ * <li>{@link ApiStabilityLevel#DEPRECATED DEPRECATED} - The API is deprecated and may be removed in a future version.</li>
++ * </ul>
++ *
++ * <p>When applied on a method, the method-level annotation overrides the class-level annotation
++ * for that specific method.</p>
++ *
++ * @see ApiStabilityLevel
++ **/
++@Target({METHOD, TYPE, ANNOTATION_TYPE})
++@Retention(RetentionPolicy.RUNTIME)
++@Inherited
++public @interface ApiStability {
++
++    /**
++     * The stability level of the annotated API.
++     *
++     * @return the stability level
++     **/
++    ApiStabilityLevel value() default ApiStabilityLevel.STABLE;
++}
+diff --git a/modules/swagger-annotations/src/test/java/io/swagger/v3/oas/annotations/ApiStabilityTest.java b/modules/swagger-annotations/src/test/java/io/swagger/v3/oas/annotations/ApiStabilityTest.java
+new file mode 100644
+index 000000000..5a4b3c2d1
+--- /dev/null
++++ b/modules/swagger-annotations/src/test/java/io/swagger/v3/oas/annotations/ApiStabilityTest.java
+@@ -0,0 +1,133 @@
++package io.swagger.v3.oas.annotations;
++
++import io.swagger.v3.oas.annotations.enums.ApiStabilityLevel;
++import org.testng.annotations.Test;
++
++import java.lang.reflect.Method;
++
++import static org.testng.Assert.*;
++
++public class ApiStabilityTest {
++
++    @ApiStability(ApiStabilityLevel.STABLE)
++    public static class StableClass {
++        @ApiStability(ApiStabilityLevel.EXPERIMENTAL)
++        public void experimentalMethod() {
++        }
++
++        public void stableMethod() {
++        }
++    }
++
++    @ApiStability(ApiStabilityLevel.EXPERIMENTAL)
++    public static class ExperimentalClass {
++        @ApiStability(ApiStabilityLevel.DEPRECATED)
++        public void deprecatedMethod() {
++        }
++
++        public void experimentalMethod() {
++        }
++    }
++
++    @ApiStability(ApiStabilityLevel.DEPRECATED)
++    public static class DeprecatedClass {
++    }
++
++    @ApiStability
++    public static class DefaultLevelClass {
++    }
++
++    @Test
++    public void testAnnotationOnClass() throws Exception {
++        ApiStability annotation = StableClass.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), ApiStabilityLevel.STABLE);
++    }
++
++    @Test
++    public void testAnnotationOnMethod() throws Exception {
++        Method method = StableClass.class.getMethod("experimentalMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), ApiStabilityLevel.EXPERIMENTAL);
++    }
++
++    @Test
++    public void testMethodInheritsClassLevelWhenNotAnnotated() throws Exception {
++        Method method = StableClass.class.getMethod("stableMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNull(annotation);
++    }
++
++    @Test
++    public void testExperimentalStabilityLevel() throws Exception {
++        ApiStability annotation = ExperimentalClass.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), ApiStabilityLevel.EXPERIMENTAL);
++    }
++
++    @Test
++    public void testDeprecatedStabilityLevel() throws Exception {
++        Method method = ExperimentalClass.class.getMethod("deprecatedMethod");
++        ApiStability annotation = method.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), ApiStabilityLevel.DEPRECATED);
++    }
++
++    @Test
++    public void testDefaultStabilityLevel() throws Exception {
++        ApiStability annotation = DefaultLevelClass.class.getAnnotation(ApiStability.class);
++        assertNotNull(annotation);
++        assertEquals(annotation.value(), ApiStabilityLevel.STABLE);
++    }
++
++    @Test
++    public void testAllStabilityLevelsExist() {
++        for (ApiStabilityLevel level : ApiStabilityLevel.values()) {
++            assertNotNull(level);
++        }
++        assertEquals(ApiStabilityLevel.values().length, 3);
++        assertTrue(containsEnum(ApiStabilityLevel.values(), ApiStabilityLevel.EXPERIMENTAL));
++        assertTrue(containsEnum(ApiStabilityLevel.values(), ApiStabilityLevel.STABLE));
++        assertTrue(containsEnum(ApiStabilityLevel.values(), ApiStabilityLevel.DEPRECATED));
++    }
++
++    @Test
++    public void testAnnotationRetentionPolicy() {
++        assertEquals(ApiStability.class.getAnnotation(java.lang.annotation.Retention.class).value(),
++                java.lang.annotation.RetentionPolicy.RUNTIME);
++    }
++
++    @Test
++    public void testAnnotationTargetTypes() {
++        java.lang.annotation.Target target = ApiStability.class.getAnnotation(java.lang.annotation.Target.class);
++        java.lang.annotation.ElementType[] elementTypes = target.value();
++
++        assertTrue(containsElementType(elementTypes, java.lang.annotation.ElementType.TYPE));
++        assertTrue(containsElementType(elementTypes, java.lang.annotation.ElementType.METHOD));
++        assertTrue(containsElementType(elementTypes, java.lang.annotation.ElementType.ANNOTATION_TYPE));
++    }
++
++    @Test
++    public void testAnnotationIsInherited() {
++        assertNotNull(ApiStability.class.getAnnotation(java.lang.annotation.Inherited.class));
++    }
++
++    private <T extends Enum<T>> boolean containsEnum(T[] values, T target) {
++        for (T value : values) {
++            if (value == target) {
++                return true;
++            }
++        }
++        return false;
++    }
++
++    private boolean containsElementType(java.lang.annotation.ElementType[] types, java.lang.annotation.ElementType target) {
++        for (java.lang.annotation.ElementType type : types) {
++            if (type == target) {
++                return true;
++            }
++        }
++        return false;
++    }
++}
