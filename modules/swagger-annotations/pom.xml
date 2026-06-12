@@ -10,6 +10,10 @@
     <artifactId>swagger-annotations</artifactId>
     <name>swagger-annotations</name>
     <description>swagger-annotations</description>
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.java.release>17</project.java.release>
+    </properties>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <defaultGoal>install</defaultGoal>
@@ -17,8 +21,37 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>17</release>
+                            <source>17</source>
+                            <target>17</target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <release>17</release>
+                            <source>17</source>
+                            <target>17</target>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <release>17</release>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -31,6 +64,10 @@
                 <configuration>
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifest>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
                         <manifestEntries>
                             <Automatic-Module-Name>io.swagger.v3.oas.annotations</Automatic-Module-Name>
                         </manifestEntries>
